@@ -968,7 +968,10 @@ func saveIndexTheme() {
 			"Name=Default",
 			"Comment=Default Cursor Theme",
 		}
-		lines = append(lines, fmt.Sprintf("Inherits=%s", gsettings.cursorTheme))
+		// in hope to fix #90
+		if gsettings.cursorTheme != "default" {
+			lines = append(lines, fmt.Sprintf("Inherits=%s", gsettings.cursorTheme))
+		}
 		saveTextFile(lines, indexThemeFile)
 	} else {
 		log.Warn("Couldn't find icons folder")
@@ -1210,12 +1213,20 @@ func saveTextFile(text []string, path string) {
 	file.Close()
 }
 
-func listFiles(dir string) ([]os.DirEntry, error) {
+func listFiles(dir string) ([]os.FileInfo, error) {
 	files, err := os.ReadDir(dir)
-	if err == nil {
-		return files, nil
+	if err != nil {
+		return nil, err
 	}
-	return nil, err
+
+	var res []os.FileInfo
+	for _, f := range files {
+		if st, err := os.Stat(filepath.Join(dir, f.Name())); err == nil {
+			res = append(res, st)
+		}
+	}
+
+	return res, nil
 }
 
 func isIn(slice []string, val string) bool {
