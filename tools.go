@@ -398,6 +398,16 @@ func applyGsettings() {
 		log.Infof("cursor-size: %s OK", val)
 	}
 
+	//mychange
+	cmd = exec.Command("hyprctl", "setcursor", gsettings.cursorTheme, val)
+	err = cmd.Run()
+	if err != nil {
+		log.Warnf("hyprcursor: %s", err)
+	} else {
+		log.Infof("hyprcursor: %s OK", val)
+	}
+	//
+
 	cmd = exec.Command("gsettings", "set", gnomeSchema, "font-name", gsettings.fontName)
 	err = cmd.Run()
 	if err != nil {
